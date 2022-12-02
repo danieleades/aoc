@@ -11,7 +11,7 @@ pub struct Day {
 
 pub struct Part {
     test_expected: u32,
-    solution: Box<dyn Fn(&str) -> u32>,
+    solution: &'static dyn Fn(&str) -> u32,
 }
 
 impl Part {
@@ -25,31 +25,37 @@ pub struct Builder {
 }
 
 impl Builder {
-    pub fn part1(mut self, test_expected: u32, solution: impl Solution) -> Self {
+    pub const fn part1<F>(mut self, test_expected: u32, solution: &'static F) -> Self
+    where
+        F: Solution,
+    {
         let part = Part {
             test_expected,
-            solution: Box::new(solution),
+            solution,
         };
         self.day.part1 = Some(part);
         self
     }
 
-    pub fn part2(mut self, test_expected: u32, solution: impl Solution) -> Self {
+    pub const fn part2<F>(mut self, test_expected: u32, solution: &'static F) -> Self
+    where
+        F: Solution,
+    {
         let part = Part {
             test_expected,
-            solution: Box::new(solution),
+            solution,
         };
         self.day.part2 = Some(part);
         self
     }
 
-    pub fn build(self) -> Day {
+    pub const fn build(self) -> Day {
         self.day
     }
 }
 
 impl Day {
-    pub fn builder(test_input: &'static str, input: &'static str) -> Builder {
+    pub const fn builder(test_input: &'static str, input: &'static str) -> Builder {
         let day = Day {
             test_input,
             input,
